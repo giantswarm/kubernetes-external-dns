@@ -1,0 +1,29 @@
+# Default values for external-dns-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+name: external-dns
+namespace: kube-system
+
+domainFilter: gigantic.io
+provider: azure
+
+sources:
+  - service
+  # Disable ingress source by default.
+  # - ingress
+
+metricsPort: 10254
+priviligedPspRoleName: privileged-psp-user
+
+image:
+  repository: quay.io/r7vme/external-dns
+  tag: test
+
+resources:
+  limits:
+    cpu: 10m
+    memory: 25Mi
+  requests:
+    cpu: 10m
+    memory: 25Mi

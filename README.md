@@ -1,2 +1,2 @@
 # kubernetes-external-dns
-Helm for external-dns service running in guest clusters
+Helm chart for external-dns service running in guest clusters
