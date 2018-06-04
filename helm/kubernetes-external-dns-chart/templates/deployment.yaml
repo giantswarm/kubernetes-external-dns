@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     giantswarm.io/service-type: "managed"
-    k8s-app: {{ .Values.name }}
+    app: {{ .Values.name }}
   annotations:
     prometheus.io/port: '{{ .Values.metricsPort }}'
     prometheus.io/scrape: 'true'
@@ -13,14 +13,14 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      k8s-app: {{ .Values.name }}
+      app: {{ .Values.name }}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         giantswarm.io/service-type: "managed"
-        k8s-app: {{ .Values.name }}
+        app: {{ .Values.name }}
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
