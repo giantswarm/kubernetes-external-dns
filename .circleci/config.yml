@@ -49,7 +49,7 @@ jobs:
     - run:
         name: Finish with cleanup, no matter if the test succeeded or not
         command: |
-          #./architect unpublish --channels=${CIRCLE_SHA1}
+          ./architect unpublish --channels=${CIRCLE_SHA1}
           ./e2e-harness teardown
         when: always
 
