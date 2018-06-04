@@ -59,7 +59,7 @@ func TestHelm(t *testing.T) {
 	}
 	defer framework.HelmCmd("delete test-deploy --purge")
 
-	err = checkdeployment()
+	err = checkDeployment()
 	if err != nil {
 		t.Fatalf("deployment manifest is incorrect: %v", err)
 	}
