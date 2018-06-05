@@ -17,13 +17,13 @@ metricsPort: 10254
 priviligedPspRoleName: privileged-psp-user
 
 image:
-  repository: quay.io/r7vme/external-dns
-  tag: test
+  repository: quay.io/giantswarm/external-dns
+  tag: v0.5.2-3-g6c05028
 
 resources:
   limits:
-    cpu: 10m
-    memory: 25Mi
+    cpu: 50m
+    memory: 50Mi
   requests:
-    cpu: 10m
-    memory: 25Mi
+    cpu: 50m
+    memory: 50Mi
