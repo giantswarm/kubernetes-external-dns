@@ -42,6 +42,7 @@ spec:
         {{- end }}
         - --domain-filter={{ .Values.domainFilter }}
         - --metrics-address=:{{ .Values.metricsPort }}
+        - --namespace={{ .Values.namespace }}
         - --registry=txt
         - --txt-owner-id=giantswarm-io-external-dns
         readinessProbe:
