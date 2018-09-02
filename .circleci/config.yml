@@ -96,7 +96,7 @@ workflows:
             branches:
               only: master
           requires:
-          - e2eTest
+          - e2eTestBasic
 
       - publish_to_stable:
           filters:
