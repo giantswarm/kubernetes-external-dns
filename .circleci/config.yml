@@ -103,4 +103,4 @@ workflows:
             branches:
               only: master
           requires:
-          - deploy
+          - e2eTestBasic
