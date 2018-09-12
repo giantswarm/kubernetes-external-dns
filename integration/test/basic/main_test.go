@@ -100,7 +100,7 @@ func init() {
 				RunReleaseTests: false,
 			},
 			ChartResources: managedservices.ChartResources{
-				DaemonSets: []managedservices.DaemonSet{
+				Deployments: []managedservices.Deployment{
 					{
 						Name:      appName,
 						Namespace: metav1.NamespaceSystem,
@@ -111,6 +111,7 @@ func init() {
 						MatchLabels: map[string]string{
 							"app": appName,
 						},
+						Replicas: 1,
 					},
 				},
 			},
