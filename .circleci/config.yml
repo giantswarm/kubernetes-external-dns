@@ -87,7 +87,7 @@ workflows:
     jobs:
       - build
 
-      - e2eTest:
+      - e2eTestBasic:
           requires:
           - build
 
