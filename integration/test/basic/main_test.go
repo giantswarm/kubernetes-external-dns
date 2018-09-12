@@ -92,9 +92,10 @@ func init() {
 			Logger:        l,
 
 			ChartConfig: managedservices.ChartConfig{
-				ChannelName:     fmt.Sprintf("%s-%s", env.CircleSHA(), testName),
-				ChartName:       chartName,
-				ChartValues:     "",
+				ChannelName: fmt.Sprintf("%s-%s", env.CircleSHA(), testName),
+				ChartName:   chartName,
+				// Use inmemory provider so chart can be installed in minikube.
+				ChartValues:     "{ \"provider\": \"inmemory\" }",
 				Namespace:       metav1.NamespaceSystem,
 				RunReleaseTests: false,
 			},
