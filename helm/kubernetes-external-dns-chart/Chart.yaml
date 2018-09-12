@@ -2,4 +2,4 @@ apiVersion: v1
 appVersion: v0.5.2-3-g6c05028
 description: A Helm chart for the external-dns
 name: kubernetes-external-dns-chart
-version: 0.1.0
+version: 0.1.1
