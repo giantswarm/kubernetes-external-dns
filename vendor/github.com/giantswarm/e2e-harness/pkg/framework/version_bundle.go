@@ -3,10 +3,10 @@ package framework
 import (
 	"context"
 	"fmt"
-	"log"
 	"sort"
 
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/versionbundle"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
@@ -18,17 +18,27 @@ const (
 	defaultRepo  = "installations"
 )
 
-type SortReleasesByTime []versionbundle.IndexRelease
-
-func (b SortReleasesByTime) Len() int           { return len(b) }
-func (b SortReleasesByTime) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
-func (b SortReleasesByTime) Less(i, j int) bool { return b[i].Date.UnixNano() < b[j].Date.UnixNano() }
-
+// VBVParams holds information which we can use to query  versionbundle
+// version information from the installations repository.
 type VBVParams struct {
+	// Component is the name of an authority inside a versionbundle IndexRelease.
+	// e.g. aws-operator
 	Component string
-	Provider  string
-	Token     string
-	VType     string
+	// Provider is the provider of a versionbundle IndexRelease.
+	// This can be aws, azure or kvm.
+	Provider string
+	// Token is a Github token which is authorized to read from the installations
+	// repository.
+	Token string
+	// VType is the version type of a versionbundle IndexRelease which can be
+	// either wip or active.
+	VType string
+}
+
+var logger micrologger.Logger
+
+func init() {
+	logger, _ = micrologger.New(micrologger.Config{})
 }
 
 func GetVersionBundleVersion(params *VBVParams) (string, error) {
@@ -36,7 +46,6 @@ func GetVersionBundleVersion(params *VBVParams) (string, error) {
 	if err != nil {
 		return "", microerror.Mask(err)
 	}
-	log.Printf("Tested version %q", params.VType)
 
 	content, err := getContent(params.Provider, params.Token)
 	if err != nil {
@@ -48,8 +57,30 @@ func GetVersionBundleVersion(params *VBVParams) (string, error) {
 		return "", microerror.Mask(err)
 	}
 
-	log.Printf("Version Bundle Version %q", output)
+	logger.Log("level", "debug", "message", fmt.Sprintf("tested version '%s'", params.VType))
+	logger.Log("level", "debug", "message", fmt.Sprintf("version bundle version '%s'", output))
+
 	return output, nil
+}
+
+func GetAuthorities(params *VBVParams) ([]versionbundle.Authority, error) {
+	err := checkType(params.VType)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+	logger.Log("level", "debug", "message", fmt.Sprintf("tested version '%s'", params.VType))
+
+	content, err := getContent(params.Provider, params.Token)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	authorities, err := extractAuthorities(content, params.VType)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	return authorities, nil
 }
 
 func getContent(provider, token string) (string, error) {
@@ -88,30 +119,40 @@ func checkType(vType string) error {
 		}
 	}
 	if !isValid {
-		return fmt.Errorf("%q is not a valid version bundle version type", vType)
+		return fmt.Errorf("'%s' is not a valid version bundle version type", vType)
 	}
 
 	return nil
 }
 
 func extractReleaseVersion(content, vType, component string) (string, error) {
-	var indexReleases []versionbundle.IndexRelease
-
-	err := yaml.Unmarshal([]byte(content), &indexReleases)
+	authorities, err := extractAuthorities(content, vType)
 	if err != nil {
 		return "", microerror.Mask(err)
 	}
 
-	sortedReleases := SortReleasesByTime(indexReleases)
+	for _, a := range authorities {
+		if a.Name == component {
+			return a.Version, nil
+		}
+	}
+	return "", microerror.Mask(notFoundError)
+}
+
+func extractAuthorities(content, vType string) ([]versionbundle.Authority, error) {
+	var indexReleases []versionbundle.IndexRelease
+
+	err := yaml.Unmarshal([]byte(content), &indexReleases)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	sortedReleases := versionbundle.SortIndexReleasesByVersion(indexReleases)
 	sort.Sort(sort.Reverse(sortedReleases))
 	for _, ir := range sortedReleases {
 		if vType == "wip" && !ir.Active || vType == "current" && ir.Active {
-			for _, a := range ir.Authorities {
-				if a.Name == component {
-					return a.Version, nil
-				}
-			}
+			return ir.Authorities, nil
 		}
 	}
-	return "", nil
+	return nil, microerror.Mask(notFoundError)
 }

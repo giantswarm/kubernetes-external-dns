@@ -33,12 +33,9 @@ spec:
         {{- range .Values.sources }}
         - --source={{ . }}
         {{- end }}
+        - --provider={{ .Values.provider }}
         {{- if eq .Values.provider "azure" }}
-        - --provider=azure
         - --azure-config-file=/config/azure.yaml
-        {{- end }}
-        {{- if eq .Values.provider "aws" }}
-        - --provider=aws
         {{- end }}
         - --domain-filter={{ .Values.domainFilter }}
         - --metrics-address=:{{ .Values.metricsPort }}
