@@ -107,7 +107,7 @@ func init() {
 						Name:      appName,
 						Namespace: metav1.NamespaceSystem,
 						DeploymentLabels: map[string]string{
-							"app": appName,
+							"app":                        appName,
 							"giantswarm.io/service-type": "managed",
 						},
 						MatchLabels: map[string]string{
