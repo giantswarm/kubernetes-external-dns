@@ -5,6 +5,9 @@
 name: external-dns
 namespace: kube-system
 
+userID: 65534
+groupID: 65534
+
 domainFilter: gigantic.io
 provider: azure
 
@@ -14,7 +17,6 @@ sources:
   # - ingress
 
 metricsPort: 10254
-priviligedPspRoleName: privileged-psp-user
 
 image:
   repository: quay.io/giantswarm/external-dns

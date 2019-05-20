@@ -26,7 +26,17 @@ spec:
     spec:
       serviceAccountName: {{ .Values.name }}
       securityContext:
-        runAsUser: 0
+        runAsUser: {{ .Values.userID }}
+        runAsGroup: {{ .Values.groupID }}
+      {{- if eq .Values.provider "azure" }}
+      initContainers:
+      - name: setup-volume-mount-owner
+        image: quay.io/giantswarm/busybox:1.28.3
+        command: ["sh", "-c", "chown -R {{ .Values.userID }}:{{ .Values.groupID }} /config/azure.yaml || true"]
+        volumeMounts:
+        - name: azure-config-file
+          mountPath: /config
+      {{- end }}
       containers:
       - name: {{ .Values.name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
