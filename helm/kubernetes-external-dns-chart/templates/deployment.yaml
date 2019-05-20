@@ -31,10 +31,10 @@ spec:
       initContainers:
       - name: setup-volume-mount-owner
         image: quay.io/giantswarm/busybox:1.28.3
-        command: ["sh", "-c", "chown -R {{ .Values.userID }}:{{ .Values.groupID }} /config/azure.yaml"]
-        volumeMounts:                                                           
-        - mountPath: /config                                                    
-          name: azure-config-file
+        command: ["sh", "-c", "chown -R {{ .Values.userID }}:{{ .Values.groupID }} /config/azure.yaml || true"]
+        volumeMounts:
+        - name: azure-config-file
+          mountPath: /config
       containers:
       - name: {{ .Values.name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
