@@ -25,6 +25,7 @@ spec:
   - 'secret'
   - 'configMap'
   - 'hostPath'
+  - 'emptyDir'
   hostPID: false
   hostIPC: false
   hostNetwork: false
