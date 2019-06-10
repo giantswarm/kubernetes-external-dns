@@ -28,15 +28,7 @@ spec:
       securityContext:
         runAsUser: {{ .Values.userID }}
         runAsGroup: {{ .Values.groupID }}
-      {{- if eq .Values.provider "azure" }}
-      initContainers:
-      - name: setup-volume-mount-owner
-        image: quay.io/giantswarm/busybox:1.28.3
-        command: ["sh", "-c", "chown -R {{ .Values.userID }}:{{ .Values.groupID }} /config/azure.yaml || true"]
-        volumeMounts:
-        - name: azure-config-file
-          mountPath: /config
-      {{- end }}
+        fsGroup: {{ .Values.groupID }}
       containers:
       - name: {{ .Values.name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -47,7 +39,7 @@ spec:
         {{- end }}
         - --provider={{ .Values.provider }}
         {{- if eq .Values.provider "azure" }}
-        - --azure-config-file=/config/azure.yaml
+        - --azure-config-file=/azure/config/azure.yaml
         {{- end }}
         - --domain-filter={{ .Values.domainFilter }}
         - --metrics-address=:{{ .Values.metricsPort }}
@@ -71,10 +63,14 @@ spec:
       {{- if eq .Values.provider "azure" }}
         volumeMounts:
         - name: azure-config-file
-          mountPath: /config
+          mountPath: /azure/config
           readOnly: true
+        - mountPath: /azure
+          name: azure-config-file-ownership
       volumes:
       - name: azure-config-file
         hostPath:
           path: /etc/kubernetes/config
+      - emptyDir: {}
+        name: azure-config-file-ownership
       {{- end }}
