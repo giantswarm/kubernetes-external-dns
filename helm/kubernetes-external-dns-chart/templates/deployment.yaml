@@ -29,6 +29,7 @@ spec:
         runAsUser: {{ .Values.userID }}
         runAsGroup: {{ .Values.groupID }}
         fsGroup: {{ .Values.groupID }}
+      priorityClassName: giantswarm-critical
       containers:
       - name: {{ .Values.name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
