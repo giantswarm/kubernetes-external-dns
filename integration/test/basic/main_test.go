@@ -109,7 +109,7 @@ func init() {
 				ChannelName: fmt.Sprintf("%s-%s", env.CircleSHA(), testName),
 				ChartName:   chartName,
 				// Use inmemory provider so chart can be installed in minikube.
-				ChartValues:     "{ \"provider\": \"inmemory\" }",
+				ChartValues:     "{ \"provider\": \"inmemory\", \"e2e\": true }",
 				Namespace:       metav1.NamespaceSystem,
 				RunReleaseTests: false,
 			},
